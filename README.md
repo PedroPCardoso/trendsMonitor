@@ -1,59 +1,83 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Trends Monitor
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Monitor real-time trending topics across **TikTok**, **Instagram**, **YouTube**, and **Google**.
 
-## About Laravel
+## 🚀 Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Multi-Platform:** Aggregates trends from major social networks.
+- **Real-Time Updates:** Automated scrapers and API integrations run hourly.
+- **Modern UI:** Built with React, Inertia.js, and Tailwind CSS.
+- **Modular Architecture:** Laravel DDD (Domain-Driven Design) for maintainable code.
+- **Dockerized:** Ready for easy deployment with Docker Compose.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🛠 Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Backend:** Laravel 12 (PHP 8.2)
+- **Frontend:** React + TypeScript + Inertia.js
+- **Scrapers:** Python 3 (Playwright, PyTrends)
+- **Database:** MySQL 8
+- **Cache/Queue:** Redis
 
-## Learning Laravel
+## 🐳 Docker Setup (Recommended)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Quickly start the application with Docker.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. Prerequisites
+- Docker & Docker Compose installed.
 
-## Laravel Sponsors
+### 2. Configuration
+Copy the environment file and configure your API Keys:
+```bash
+cp .env.example .env
+```
+Edit `.env` and set:
+- `DB_HOST=db`
+- `REDIS_HOST=redis`
+- `YOUTUBE_API_KEY=your_key`
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 3. Build & Run
+```bash
+# Build and start containers
+docker-compose up -d --build
 
-### Premium Partners
+# Install dependencies (first time only)
+docker-compose exec app composer install
+docker-compose exec app npm install
+docker-compose exec app npm run build
+docker-compose exec app php artisan migrate
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# Generate App Key
+docker-compose exec app php artisan key:generate
+```
 
-## Contributing
+### 4. Access
+- **App:** [http://localhost:8000](http://localhost:8000)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 5. Start Workers
+For trends to update, you must run the queue worker:
+```bash
+docker-compose exec app php artisan queue:work
+```
+Or the scheduler:
+```bash
+docker-compose exec app php artisan schedule:work
+```
 
-## Code of Conduct
+## 🧪 Testing Scrapers
+To verify if Python scrapers are working correctly inside Docker:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+# Test TikTok Scraper
+docker-compose exec app python3 python/tiktok_trends.py
 
-## Security Vulnerabilities
+# Test Google Trends
+docker-compose exec app python3 python/google_trends.py
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🏗 Architecture
+The application is structured using modules in `app/Modules`:
+- **Shared:** Core infrastructure.
+- **YouTube:** API v3 integration.
+- **Google:** Python PyTrends script integration.
+- **TikTok:** Python Playwright scraper integration.
+- **Instagram:** Python Playwright hashtags scraper.

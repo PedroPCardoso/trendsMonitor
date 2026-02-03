@@ -1,9 +1,8 @@
-
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
-import { TrendsData } from '@/types/trends';
+import React, { useEffect, useState } from 'react';
+import PublicLayout from '@/Layouts/PublicLayout';
 import PlatformSection from '@/Components/PlatformSection';
-import { useEffect } from 'react';
+import { TrendsData } from '@/types/trends';
 
 interface Props {
     trends: TrendsData;
@@ -12,7 +11,6 @@ interface Props {
 
 export default function Dashboard({ trends, last_update }: Props) {
 
-    // Auto refresh every 60 seconds
     useEffect(() => {
         const interval = setInterval(() => {
             router.reload({ only: ['trends', 'last_update'] });
@@ -20,64 +18,76 @@ export default function Dashboard({ trends, last_update }: Props) {
         return () => clearInterval(interval);
     }, []);
 
-    const refreshNow = () => {
+    const manualRefresh = () => {
         router.reload({ only: ['trends', 'last_update'] });
     }
 
     return (
-        <AuthenticatedLayout
-            header={<h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Trends Monitor</h2>}
-        >
+        <PublicLayout>
             <Head title="Real-time Trends" />
 
-            <div className="py-6 h-screen overflow-hidden flex flex-col">
-                <div className="max-w-[1920px] w-full mx-auto sm:px-4 lg:px-6 h-full">
-                    <div className="mb-4 flex justify-between items-center px-2">
-                        <span className="text-xs text-gray-500">Last updated: {last_update}</span>
-                        <button onClick={refreshNow} className="px-3 py-1 bg-indigo-600 text-white rounded text-xs hover:bg-indigo-700">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Hero Section */}
+                <div className="text-center mb-16 relative">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-purple-500/20 blur-[100px] rounded-full -z-10"></div>
+                    <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+                        <span className="bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
+                            Discover What's
+                        </span>
+                        <br />
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 glow-text">
+                            Trending Now
+                        </span>
+                    </h1>
+                    <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8">
+                        Real-time insights from TikTok, Instagram, YouTube, and Google.
+                        <br />Updated hourly to keep you ahead of the curve.
+                    </p>
+
+                    <div className="flex items-center justify-center gap-4 text-sm text-gray-500 font-mono">
+                        <span className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                            Live System
+                        </span>
+                        <span>•</span>
+                        <span>Last update: {last_update}</span>
+                        <button
+                            onClick={manualRefresh}
+                            className="ml-4 px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all text-xs text-white cursor-pointer"
+                        >
                             Refresh
                         </button>
                     </div>
+                </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 h-[calc(100%-80px)]">
-                        {/* TikTok */}
-                        <PlatformSection
-                            title="TikTok"
-                            platform="tiktok"
-                            icon={<span>🎵</span>}
-                            color="#000000"
-                            trends={trends.tiktok || []}
-                        />
-
-                        {/* Instagram */}
-                        <PlatformSection
-                            title="Instagram"
-                            platform="instagram"
-                            icon={<span>📸</span>}
-                            color="#E1306C"
-                            trends={trends.instagram || []}
-                        />
-
-                        {/* YouTube */}
-                        <PlatformSection
-                            title="YouTube"
-                            platform="youtube"
-                            icon={<span>📺</span>}
-                            color="#FF0000"
-                            trends={trends.youtube || []}
-                        />
-
-                        {/* Google */}
-                        <PlatformSection
-                            title="Google"
-                            platform="google"
-                            icon={<span>🔍</span>}
-                            color="#4285F4"
-                            trends={trends.google || []}
-                        />
-                    </div>
+                {/* Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <PlatformSection
+                        platform="tiktok"
+                        trends={trends.tiktok || []}
+                        icon={<span className="text-2xl">🎵</span>}
+                        color="from-cyan-400 to-blue-500"
+                    />
+                    <PlatformSection
+                        platform="instagram"
+                        trends={trends.instagram || []}
+                        icon={<span className="text-2xl">📸</span>}
+                        color="from-purple-500 to-pink-500"
+                    />
+                    <PlatformSection
+                        platform="youtube"
+                        trends={trends.youtube || []}
+                        icon={<span className="text-2xl">📺</span>}
+                        color="from-red-500 to-orange-500"
+                    />
+                    <PlatformSection
+                        platform="google"
+                        trends={trends.google || []}
+                        icon={<span className="text-2xl">🔍</span>}
+                        color="from-blue-400 to-green-400"
+                    />
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </PublicLayout>
     );
 }

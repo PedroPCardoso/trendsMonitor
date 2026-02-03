@@ -1,0 +1,61 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        user: laravel
+        uid: 1000
+    image: trends-monitor-app
+    container_name: trends-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    networks:
+      - trends-network
+    depends_on:
+      - db
+      - redis
+
+  nginx:
+    image: nginx:alpine
+    container_name: trends-nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - trends-network
+    depends_on:
+      - app
+
+  db:
+    image: mysql:8.0
+    container_name: trends-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - trends-network
+
+  redis:
+    image: redis:alpine
+    container_name: trends-redis
+    restart: unless-stopped
+    networks:
+      - trends-network
+
+networks:
+  trends-network:
+    driver: bridge
+
+volumes:
+  dbdata:

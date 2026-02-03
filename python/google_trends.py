@@ -17,18 +17,33 @@ def fetch_google_trends(region='BR', hl='pt-BR'):
         # Method 1: trending_searches (Daily Trends)
         # result_df = pytrends.trending_searches(pn=region.lower()) 
         
-        # Method 2: realtime_trending_searches (Last 24h, real-time)
-        result_df = pytrends.realtime_trending_searches(pn=region)
+        try:
+            # Try Realtime trends first
+            result_df = pytrends.realtime_trending_searches(pn=region)
+            trending_type = 'realtime'
+        except Exception:
+            # Fallback to Daily trends
+            fallback_region = 'brazil' if region == 'BR' else region.lower()
+            result_df = pytrends.trending_searches(pn=fallback_region)
+            trending_type = 'daily'
         
         trends = []
         if not result_df.empty:
             # result_df columns: title, entityNames (list)
             for index, row in result_df.iterrows():
-                trends.append({
-                    "title": row['title'],
-                    "entity_names": row['entityNames'] if 'entityNames' in row else [],
-                    "rank": int(index) + 1
-                })
+                if trending_type == 'realtime':
+                    trends.append({
+                        "title": row['title'],
+                        "entity_names": row['entityNames'] if 'entityNames' in row else [],
+                        "rank": int(index) + 1
+                    })
+                else:
+                    # Daily trends structure (0: 'Query')
+                    trends.append({
+                        "title": row[0],
+                        "entity_names": [],
+                        "rank": int(index) + 1
+                    })
                 
                 if len(trends) >= 10:
                     break

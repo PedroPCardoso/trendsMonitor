@@ -1,3 +1,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-[#030014] text-white overflow-x-hidden;
+    }
+
+    /* Animated Mesh Gradient Background */
+    .mesh-gradient-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1;
+        background: radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.15) 0%, transparent 25%),
+            radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.15) 0%, transparent 25%);
+        pointer-events: none;
+    }
+}
+
+@layer components {
+    .glass-panel {
+        @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl;
+    }
+
+    .glass-card {
+        @apply bg-[#0a0a0a]/60 backdrop-blur-md border border-white/5 transition-all duration-300;
+    }
+
+    .glow-text {
+        text-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+    }
+}

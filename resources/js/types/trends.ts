@@ -8,6 +8,8 @@ export interface Trend {
     metadata: Record<string, any>;
 }
 
+export type PlatformName = 'youtube' | 'google' | 'tiktok' | 'instagram';
+
 export interface TrendsData {
     youtube: Trend[];
     google: Trend[];

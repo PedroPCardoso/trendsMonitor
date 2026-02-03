@@ -1,38 +1,44 @@
-
-import { Trend } from '@/types/trends';
+import React from 'react';
+import { Trend, PlatformName } from '@/types/trends';
 import TrendCard from './TrendCard';
 
 interface Props {
-    title: string;
-    icon: React.ReactNode;
+    platform: PlatformName;
     trends: Trend[];
+    icon: React.ReactNode;
     color: string;
-    platform: string;
 }
 
-export default function PlatformSection({ title, icon, trends, color, platform }: Props) {
-    return (
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-800 h-full">
-            <div className={`flex items-center gap-2 mb-4 pb-2 border-b ${color} border-opacity-20`} style={{ borderColor: color }}>
-                <span className={`text-xl text-${color}-500`}>{icon}</span>
-                <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200">{title}</h2>
-                <span className="ml-auto text-xs font-mono bg-gray-200 dark:bg-gray-800 px-2 py-1 rounded">
-                    {trends.length}
-                </span>
-            </div>
+export default function PlatformSection({ platform, trends, icon, color }: Props) {
+    const title = platform.charAt(0).toUpperCase() + platform.slice(1);
 
-            <div className="space-y-3 h-[600px] overflow-y-auto pr-2 scrollbar-thin">
-                {trends.length === 0 ? (
-                    <div className="text-center py-10 text-gray-400 text-sm">
-                        No trends found.
-                        <br />
-                        Running workers...
+    return (
+        <div className="glass-panel rounded-2xl p-1 relative overflow-hidden group h-full flex flex-col">
+            <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${color}`}></div>
+
+            <div className="p-5 flex-1 flex flex-col">
+                <div className="flex items-center gap-3 mb-6">
+                    <div className={`p-2 rounded-lg bg-gradient-to-br ${color} bg-opacity-10 text-white shadow-lg`}>
+                        {icon}
                     </div>
-                ) : (
-                    trends.map((trend) => (
-                        <TrendCard key={trend.rank} trend={trend} platform={platform} />
-                    ))
-                )}
+                    <h3 className="text-lg font-bold text-white tracking-wide">{title}</h3>
+                    <div className="ml-auto text-xs font-mono text-gray-500 bg-white/5 px-2 py-1 rounded">
+                        {trends.length} items
+                    </div>
+                </div>
+
+                <div className="space-y-3 flex-1 overflow-y-auto pr-2 scrollbar-thin">
+                    {trends.length === 0 ? (
+                        <div className="h-40 flex flex-col items-center justify-center text-center p-4 border border-dashed border-white/10 rounded-xl bg-white/5">
+                            <div className="mb-2 w-5 h-5 border-2 border-white/20 border-t-purple-500 rounded-full animate-spin"></div>
+                            <p className="text-gray-500 text-sm">Scanning trends...</p>
+                        </div>
+                    ) : (
+                        trends.map((trend, index) => (
+                            <TrendCard key={index} trend={trend} index={index} color={color} platform={platform} />
+                        ))
+                    )}
+                </div>
             </div>
         </div>
     );
